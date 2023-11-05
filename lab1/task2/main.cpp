@@ -3,22 +3,22 @@
 
 #if false
 void generate_model() {
-    cv::Mat model = cv::Mat::zeros(141, 113, CV_8UC3);
+    cv::Mat model = cv::Mat::zeros(141, 141, CV_8UC3);
 
-    cv::Point base_pt1 = cv::Point(16, 40);
-    cv::Point base_pt4 = cv::Point(16+81, 40+101);
+    cv::Point base_pt1 = cv::Point(30, 40);
+    cv::Point base_pt4 = cv::Point(30+81, 40+101);
     
-    cv::Point back_wheel1 = cv::Point(0, 40+8);
-    cv::Point back_wheel4 = cv::Point(16, 40+8 + 101 - 16);
+    cv::Point back_wheel1 = cv::Point(14, 40+8);
+    cv::Point back_wheel4 = cv::Point(30, 40+8 + 101 - 16);
 
-    cv::Point back_wheel5 = cv::Point(112, 40+8);
-    cv::Point back_wheel8 = cv::Point(112-16, 40+8 + 101 - 16);
+    cv::Point back_wheel5 = cv::Point(112+14, 40+8);
+    cv::Point back_wheel8 = cv::Point(140-16-14, 40+8 + 101 - 16);
     
-    cv::Point front_wheel1 = cv::Point(56-24, 40+25+25+1-36);
-    cv::Point front_wheel4 = cv::Point(56+24, 40+25+25+1+36);
+    cv::Point front_wheel1 = cv::Point(56-24+14, 40+25+25+1-36);
+    cv::Point front_wheel4 = cv::Point(56+24+14, 40+25+25+1+36);
 
-    cv::Point front_wheel5 = cv::Point(56-6, 0);
-    cv::Point front_wheel8 = cv::Point(56+6, 40+25+25+1-35);
+    cv::Point front_wheel5 = cv::Point(56-6+14, 0);
+    cv::Point front_wheel8 = cv::Point(56+6+14, 40+25+25+1-35);
 
     cv::Rect base(base_pt1, base_pt4);
     cv::Rect b1(back_wheel1, back_wheel4);

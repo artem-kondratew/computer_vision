@@ -9,15 +9,13 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+#include "keys.hpp"
+#include "shell.hpp"
+
 
 class Tank {
 private:
-    static const int KEY_UP = 82;
-    static const int KEY_DOWN = 84;
-    static const int KEY_LEFT = 81;
-    static const int KEY_RIGHT = 83;
-    static const int KEY_SPACE = 32;
-    static const int KEY_ESC = 27;
+    static const int step = 5;
 
     cv::Mat tank;
     int w;
@@ -30,6 +28,13 @@ private:
 public:
     Tank(cv::Mat tank_model);
     void spawn(cv::Mat frame, cv::Point spawn_pt);
+    bool checkMoveUp(cv::Point spawn_pt, int new_w, int new_h);
+    bool checkMoveDown(cv::Point spawn_pt, int new_w, int new_h);
+    bool checkMoveLeft(cv::Point spawn_pt, int new_w, int new_h);
+    bool checkMoveRight(cv::Point spawn_pt, int new_w, int new_h);
+    bool checkSpawnPosition(cv::Point spawn_pt, int new_w, int new_h);
+    bool rotate(cv::Point spawn_pt, int r);
+    void createShell(cv::Point spawn_pt);
     void play();
 };
 
