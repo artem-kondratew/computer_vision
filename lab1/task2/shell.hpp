@@ -3,7 +3,6 @@
 
 
 #include <cstdint>
-#include <iostream>
 #include <list>
 
 #include <opencv2/imgproc.hpp>

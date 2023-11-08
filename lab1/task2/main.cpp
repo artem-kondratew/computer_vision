@@ -44,7 +44,7 @@ void generate_model() {
 
 int main(int argc, char** argv) {
 
-    cv::Mat tank_model = cv::imread("./tank.jpg");
+    cv::Mat tank_model = cv::imread("/home/user/Projects/computer_vision/lab1/task2/tank.jpg");
     
     Tank tank(tank_model);
 
