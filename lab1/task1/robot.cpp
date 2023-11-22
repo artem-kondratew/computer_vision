@@ -116,9 +116,6 @@ void Robot::draw() {
         }
         cv::imshow("robot_travelling", frame);
         cv::waitKey(20);
-        if (x == back.cols / 2) {
-            std::cout << saveTrajectory(frame) << std::endl;
-        }
     }
-    cv::waitKey(0);
+    cv::waitKey(500);
 }

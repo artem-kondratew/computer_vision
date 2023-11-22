@@ -1,8 +1,14 @@
+#include <iostream>
 #include "robot.hpp"
 
 
 int main(int argc, char** argv){
-    cv::Mat background = cv::imread("/home/user/Projects/computer_vision/lab1/task1/background.jpg");
+    if (argc != 3) {
+        std::cout << "usage: ./lab1 path_to_background path_to_save" << std::endl;
+        return 1;
+    }
+
+    cv::Mat background = cv::imread(argv[1]);
 
     std::string path_to_save = "./trajectory.jpg";
 
