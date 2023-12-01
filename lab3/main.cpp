@@ -62,9 +62,9 @@ cv::Mat findTarget(const cv::Mat src) {
 
 int main() {
 
-    cv::Mat img0 = cv::imread("/home/user/Projects/computer_vision/lab3/task1/src/img0.jpg");
-    cv::Mat img1 = cv::imread("/home/user/Projects/computer_vision/lab3/task1/src/img1.jpg");
-    cv::Mat img2 = cv::imread("/home/user/Projects/computer_vision/lab3/task1/src/img2.jpg");
+    cv::Mat img0 = cv::imread("/home/user/Projects/computer_vision/lab3/src1/img0.jpg");
+    cv::Mat img1 = cv::imread("/home/user/Projects/computer_vision/lab3/src1/img1.jpg");
+    cv::Mat img2 = cv::imread("/home/user/Projects/computer_vision/lab3/src1/img2.jpg");
 
     cv::Mat t0 = findTarget(img0);
     cv::Mat t1 = findTarget(img1);
