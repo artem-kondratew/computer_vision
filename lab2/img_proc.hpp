@@ -11,6 +11,12 @@
 
 namespace ImgProc {
 
+using filter_type = int;
+
+const filter_type box_filter = 0;
+const filter_type gauss_filter = 1;
+const filter_type laplacian_filter = 2;
+
 const int HIGH = 255;
 
 
@@ -64,6 +70,17 @@ cv::Mat boxFilter(const cv::Mat img, const int dx, const int dy) {
 }
 
 
+cv::Mat laplacian(const cv::Mat img) {
+    const float kernel[] = {
+        0,  1, 0,
+        1, -4, 1,
+        0,  1, 0,
+    };
+
+    return convolution(img, kernel, 3, 3);
+}
+
+
 cv::Mat findDiff(const cv::Mat img1, const cv::Mat img2) {
     if (img1.rows != img2.rows || img1.cols != img2.cols || img1.channels() != img2.channels()) {
         return cv::Mat({0, 0});
@@ -90,7 +107,7 @@ cv::Mat findDiff(const cv::Mat img1, const cv::Mat img2) {
 }
 
 
-cv::Mat findLogDiff(cv::Mat img1, cv::Mat img2) {
+cv::Mat findLogDiff(const cv::Mat img1, const cv::Mat img2) {
     if (img1.rows != img2.rows || img1.cols != img2.cols || img1.channels() != img2.channels()) {
         return cv::Mat({0, 0});
     }
@@ -103,6 +120,31 @@ cv::Mat findLogDiff(cv::Mat img1, cv::Mat img2) {
     }
 
     return diff;
+}
+
+
+cv::Mat unsharpMask(const cv::Mat img, const float alpha, const filter_type ft) {
+    cv::Mat blur;
+    if (ft == box_filter) {
+        blur = boxFilter(img, 3, 3);
+    }
+    else if (ft == gauss_filter) {
+        cv::GaussianBlur(img, blur, {3, 3}, 0);
+    }
+    else if (ft == laplacian_filter) {
+        blur = laplacian(img);
+    }
+    else {
+        return cv::Mat({0, 0});
+    }
+
+    cv::Mat empty = cv::Mat::zeros({img.cols, img.rows}, CV_8UC1);
+
+    for (int i = 0; i < empty.rows * empty.cols; i++) {
+        empty.data[i] = (1 + alpha) * img.data[i] - alpha * blur.data[i];
+    }
+
+    return empty;
 }
 
 }
