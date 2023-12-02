@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(task1)
+project(lab3)
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
