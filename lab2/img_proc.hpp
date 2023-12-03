@@ -116,7 +116,8 @@ cv::Mat findLogDiff(const cv::Mat img1, const cv::Mat img2) {
 
     for (size_t i = 0; i < diff.rows * diff.cols; i++) {
         float df = std::abs(img1.data[i] - img2.data[i]);
-        diff.data[i] = 100 * std::log(1 + df);
+        float df_log = 100 * std::log(1 + df);
+        diff.data[i] = df_log > HIGH ? HIGH : df_log;
     }
 
     return diff;
