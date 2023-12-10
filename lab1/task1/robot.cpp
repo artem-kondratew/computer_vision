@@ -115,6 +115,11 @@ void Robot::draw() {
             drawRobot(frame, x);
         }
         cv::imshow("robot_travelling", frame);
+
+        if (x == back.cols / 2) {
+            saveTrajectory(frame);
+        }
+
         cv::waitKey(20);
     }
     cv::waitKey(500);

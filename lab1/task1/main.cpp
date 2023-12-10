@@ -10,7 +10,9 @@ int main(int argc, char** argv){
 
     cv::Mat background = cv::imread(argv[1]);
 
-    std::string path_to_save = "./trajectory.jpg";
+    std::string path_to_save = argv[2];
+
+    std::cout << path_to_save << std::endl;
 
     Robot robot(background, path_to_save);
 
