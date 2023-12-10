@@ -142,7 +142,10 @@ cv::Mat unsharpMask(const cv::Mat img, const float alpha, const filter_type ft) 
     cv::Mat empty = cv::Mat::zeros({img.cols, img.rows}, CV_8UC1);
 
     for (int i = 0; i < empty.rows * empty.cols; i++) {
-        empty.data[i] = (1 + alpha) * img.data[i] - alpha * blur.data[i];
+        int value  = (1 + alpha) * img.data[i] - alpha * blur.data[i];
+        value = value > HIGH ? HIGH : value;
+        value = value < 0 ? 0 : value;
+        empty.data[i] = value;
     }
 
     return empty;
