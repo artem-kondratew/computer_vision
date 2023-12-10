@@ -1,5 +1,7 @@
 #include "tank.hpp"
 
+#include <iostream>
+
 
 Tank::Tank(cv::Mat tank_model) : tank{tank_model} {
     w = tank.cols;
@@ -7,13 +9,29 @@ Tank::Tank(cv::Mat tank_model) : tank{tank_model} {
     tank_center = cv::Point(w / 2, h / 2);
     orientation = Keys::KEY_UP;
 
-    back = cv::Mat::zeros(720, 1280, CV_8UC3);
+    back = cv::imread("/home/user/Projects/computer_vision/lab1/task2/background.jpg");
     back_center = cv::Point(back.cols / 2, back.rows / 2);
+
+    for (int i = 0; i < back.rows * back.cols; i++) {
+        back.data[i] = back.data[i] == 0 ? 1 : back.data[i];
+    }
 }
 
 
 void Tank::spawn(cv::Mat frame, cv::Point spawn_pt) {
     tank.copyTo(frame(cv::Rect(spawn_pt.x - w / 2, spawn_pt.y - h / 2, w, h)));
+
+    cv::Vec3b black = {0, 0, 0};
+    cv::Vec3b white = {255, 255, 255};
+
+    for (int y = 0; y < frame.rows; y++) {
+        for (int x = 0; x < frame.cols; x++) {
+            cv::Vec3b pt = frame.at<cv::Vec3b>(cv::Point(x,y));
+            if (pt == black) {
+                frame.at<cv::Vec3b>(cv::Point(x,y)) = back.at<cv::Vec3b>(cv::Point(x,y));
+            }
+        }
+    }
 }
 
 

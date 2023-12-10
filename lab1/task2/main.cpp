@@ -1,8 +1,7 @@
 #include "tank.hpp"
 
 
-#if false
-void generate_model() {
+cv::Mat generate_model() {
     cv::Mat model = cv::Mat::zeros(141, 141, CV_8UC3);
 
     cv::Point base_pt1 = cv::Point(30, 40);
@@ -26,25 +25,20 @@ void generate_model() {
     cv::Rect f1(front_wheel1, front_wheel4);
     cv::Rect f2(front_wheel5, front_wheel8);
 
-    int c = 90;
-
     cv::rectangle(model, base, {37, 169, 37}, -1);
-    cv::rectangle(model, b1, {c, c, c}, -1);
-    cv::rectangle(model, b2, {c, c, c}, -1);
+    cv::rectangle(model, b1, {90, 90, 90}, -1);
+    cv::rectangle(model, b2, {90, 90, 90}, -1);
     cv::rectangle(model, f1, {24, 108, 24}, -1);
     cv::rectangle(model, f2, {24, 108, 24}, -1);
 
-    cv::imshow("model", model);
-    cv::waitKey(0);
-
-    cv::imwrite("./tank.jpg", model);
+    return model;
 }
-#endif
+
 
 
 int main(int argc, char** argv) {
 
-    cv::Mat tank_model = cv::imread("/home/user/Projects/computer_vision/lab1/task2/tank.jpg");
+    cv::Mat tank_model = generate_model();
     
     Tank tank(tank_model);
 
