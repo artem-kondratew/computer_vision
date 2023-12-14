@@ -241,14 +241,7 @@ cv::Point findMinDist(std::vector<std::vector<cv::Point>> contours, cv::Point la
             idx = i;
             min_dist = dist[i];
         }
-        std::cout << dist.size() << " dist " << dist[i] << std::endl;
     }
-
-    if (idx == -1) {
-        std::cout << "NOPE" << std::endl;
-    }
-
-    std::cout << idx << std::endl;
 
     return centers[idx];
 }
@@ -319,7 +312,57 @@ void task3() {
 
 
 void task4() {
+    cv::Mat src = cv::imread("/home/user/Projects/computer_vision/lab3/src4/src.jpg");
+
+    cv::Mat gray;
+    cv::cvtColor(src, gray, cv::COLOR_BGR2GRAY);
+
+    cv::Mat threshold;
+    cv::threshold(gray, threshold, 250, 255, cv::THRESH_BINARY_INV);
+
+    cv::Mat tmpl = cv::imread("/home/user/Projects/computer_vision/lab3/src4/template.jpg");
+
+    cv::Mat tmpl_gray;
+    cv::cvtColor(tmpl, tmpl_gray, cv::COLOR_BGR2GRAY);
+
+    cv::threshold(tmpl_gray, tmpl_gray, 220, 255, cv::THRESH_BINARY);   
+
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(threshold, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+
+    std::vector<std::vector<cv::Point>> tmpl_contours;
+    cv::findContours(tmpl_gray, tmpl_contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+    cv::drawContours(tmpl, tmpl_contours, -1, MAGENTA, 1);
     
+
+    double tmpl_area = cv::contourArea(tmpl_contours[0]);
+    std::cout << tmpl_area << std::endl;
+
+    for (int i = 0; i < contours.size(); i++) {
+        if (cv::contourArea(contours[i]) < 50) {
+            contours.erase(contours.begin() + i);
+            i--;
+            continue;
+        }
+
+        cv::Mat key = cv::Mat::zeros({src.cols, src.rows}, CV_8UC3);
+        cv::drawContours(key, contours, i, WHITE, -1);
+
+        double area = cv::contourArea(contours[i]);
+
+        double diff = area / tmpl_area;
+
+        cv::Moments m = cv::moments(contours[i]);
+        int x = m.m10 / m.m00;
+        int y = m.m01 / m.m00;
+
+        cv::Scalar color = 0.9 < diff && diff < 1.07 ? GREEN : RED;
+        cv::circle(src, {x, y}, 10, color, -1);
+    }
+
+    cv::imshow("src", src);
+
+    cv::waitKey(0);
 }
 
 
