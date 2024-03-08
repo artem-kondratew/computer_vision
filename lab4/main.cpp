@@ -14,75 +14,75 @@ int main() {
 
     cv::Mat opt = Fourier::getOptimalDftSize(src, CV_32FC1);
 
-    // timer.start();
-    // cv::Mat dft = Fourier::dft(opt);
-    // timer.stop();
-    // std::cout << "custom dft time: " << timer.getTimeSec() << std::endl;
-    // timer.reset();
-// 
-    // timer.start();
-    // cv::Mat idft = Fourier::idft(dft);
-    // timer.stop();
-    // std::cout << "custom idft time: " << timer.getTimeSec() << std::endl;
-    // timer.reset();
-// 
-    // cv::Mat cv_dft(cv::Size(src.cols, src.rows), CV_32FC2);
-    // timer.start();
-    // cv::dft(opt, cv_dft, cv::DFT_COMPLEX_OUTPUT);
-    // timer.stop();
-    // std::cout << "cv idft time: " << timer.getTimeSec() << std::endl;
-    // timer.reset();
-// 
-    // std::vector<std::complex<double>> dft_vector = Fourier::mat2vec(opt);
-	// timer.start();
-	// Fourier::radixTransform(dft_vector, 0);
-	// cv::Mat dft_radix = Fourier::vec2mat(dft_vector, opt.rows, opt.cols, CV_32FC2);
-	// timer.stop();
-	// std::cout << "radix dft time: " << timer.getTimeSec() << std::endl;
-	// timer.reset();
-// 
-    // timer.start();
-	// Fourier::radixTransform(dft_vector, 1);
-	// cv::Mat idft_radix = Fourier::vec2mat(dft_vector, opt.rows, opt.cols, CV_32FC1);
-	// timer.stop();
-	// std::cout << "radix idft time: " << timer.getTimeSec() << std::endl;
-	// timer.reset();
+    timer.start();
+    cv::Mat dft = Fourier::dft(opt);
+    timer.stop();
+    std::cout << "custom dft time: " << timer.getTimeSec() << std::endl;
+    timer.reset();
 
-    // cv::imshow("src", src);
-    // Fourier::show("dft", dft);
-    // Fourier::show("cv", cv_dft);
-    // cv::imshow("idft", idft);
-    // Fourier::show("radix", dft_radix);
-    // cv::imshow("i_radix", idft_radix);
+    timer.start();
+    cv::Mat idft = Fourier::idft(dft);
+    timer.stop();
+    std::cout << "custom idft time: " << timer.getTimeSec() << std::endl;
+    timer.reset();
 
-    cv::Mat sobel_x = cv::Mat_<float>(3, 3) << (-1, 0, 1, -2, 0, 2, -1, 0, 1);
-    cv::Mat sobel_y = cv::Mat_<float>(3, 3) << (-1, -2, -1, 0, 0, 0, 1, 2, 1);
-    float v = 1.0 / 9.0;
-    cv::Mat box = cv::Mat_<float>(3, 3) << (v, v, v, v, v, v, v, v, v);
-    cv::Mat laplace = cv::Mat_<float>(3, 3) << (0, 1, 0, 1, -4, 1, 0, 1, 0);
+    cv::Mat cv_dft(cv::Size(src.cols, src.rows), CV_32FC2);
+    timer.start();
+    cv::dft(opt, cv_dft, cv::DFT_COMPLEX_OUTPUT);
+    timer.stop();
+    std::cout << "cv idft time: " << timer.getTimeSec() << std::endl;
+    timer.reset();
 
-    cv::Mat dft_sobel_x = Fourier::getOptimalDftSize(sobel_x, CV_32FC1);
-    cv::Mat dft_sobel_y = Fourier::getOptimalDftSize(sobel_y, CV_32FC1);
-    cv::Mat dft_box = Fourier::getOptimalDftSize(box, CV_32FC1);
-    cv::Mat dft_laplace = Fourier::getOptimalDftSize(laplace, CV_32FC1);
+    std::vector<std::complex<double>> dft_vector = Fourier::mat2vec(opt);
+	timer.start();
+	Fourier::radixTransform(dft_vector, 0);
+	cv::Mat dft_radix = Fourier::vec2mat(dft_vector, opt.rows, opt.cols, CV_32FC2);
+	timer.stop();
+	std::cout << "radix dft time: " << timer.getTimeSec() << std::endl;
+	timer.reset();
 
-    Fourier::createKernel(sobel_x, sobel_x, 128, 128);
-    cv::imshow("sobel_x", sobel_x);
-    Fourier::createKernel(sobel_y, sobel_y, 128, 128);
-    cv::imshow("sobel_y", sobel_y);
-    Fourier::createKernel(box, box, 128, 128);
-    cv::imshow("box", box);
-    Fourier::createKernel(laplace, laplace, 128, 128);
-    cv::imshow("laplace", laplace);
+    timer.start();
+	Fourier::radixTransform(dft_vector, 1);
+	cv::Mat idft_radix = Fourier::vec2mat(dft_vector, opt.rows, opt.cols, CV_32FC1);
+	timer.stop();
+	std::cout << "radix idft time: " << timer.getTimeSec() << std::endl;
+	timer.reset();
 
-    cv::Mat s_x = Fourier::convolution(opt, dft_sobel_x);
-    cv::imshow("s_x", s_x);
-    cv::Mat s_y = Fourier::convolution(opt, dft_sobel_x);
-    cv::imshow("s_y", s_y);
-    cv::Mat b = Fourier::convolution(opt, dft_sobel_x);
-    cv::imshow("b", b);
-    cv::Mat l = Fourier::convolution(opt, dft_sobel_x);
-    cv::imshow("l", l);
+    cv::imshow("src", src);
+    Fourier::show("dft", dft);
+    Fourier::show("cv", cv_dft);
+    cv::imshow("idft", idft);
+    Fourier::show("radix", dft_radix);
+    cv::imshow("i_radix", idft_radix);
+
+    // cv::Mat sobel_x = cv::Mat_<float>(3, 3) << (-1, 0, 1, -2, 0, 2, -1, 0, 1);
+    // cv::Mat sobel_y = cv::Mat_<float>(3, 3) << (-1, -2, -1, 0, 0, 0, 1, 2, 1);
+    // float v = 1.0 / 9.0;
+    // cv::Mat box = cv::Mat_<float>(3, 3) << (v, v, v, v, v, v, v, v, v);
+    // cv::Mat laplace = cv::Mat_<float>(3, 3) << (0, 1, 0, 1, -4, 1, 0, 1, 0);
+
+    // cv::Mat dft_sobel_x = Fourier::getOptimalDftSize(sobel_x, CV_32FC1);
+    // cv::Mat dft_sobel_y = Fourier::getOptimalDftSize(sobel_y, CV_32FC1);
+    // cv::Mat dft_box = Fourier::getOptimalDftSize(box, CV_32FC1);
+    // cv::Mat dft_laplace = Fourier::getOptimalDftSize(laplace, CV_32FC1);
+
+    // Fourier::createKernel(sobel_x, sobel_x, 128, 128);
+    // cv::imshow("sobel_x", sobel_x);
+    // Fourier::createKernel(sobel_y, sobel_y, 128, 128);
+    // cv::imshow("sobel_y", sobel_y);
+    // Fourier::createKernel(box, box, 128, 128);
+    // cv::imshow("box", box);
+    // Fourier::createKernel(laplace, laplace, 128, 128);
+    // cv::imshow("laplace", laplace);
+
+    // cv::Mat s_x = Fourier::convolution(opt, dft_sobel_x);
+    // cv::imshow("s_x", s_x);
+    // cv::Mat s_y = Fourier::convolution(opt, dft_sobel_x);
+    // cv::imshow("s_y", s_y);
+    // cv::Mat b = Fourier::convolution(opt, dft_sobel_x);
+    // cv::imshow("b", b);
+    // cv::Mat l = Fourier::convolution(opt, dft_sobel_x);
+    // cv::imshow("l", l);
 
     // cv::Mat low_spec;
     // Fourier::cutLowSpec(opt, low_spec, 180);
