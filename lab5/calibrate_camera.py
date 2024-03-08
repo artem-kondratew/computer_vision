@@ -10,7 +10,7 @@ output_file = './calibration_params.yaml'
 
 
 def main():
-    cap = cv.VideoCapture(0)
+    cap = cv.VideoCapture(2)
 
     all_marker_corners = []
     all_marker_ids = []
@@ -70,5 +70,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
