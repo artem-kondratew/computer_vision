@@ -151,6 +151,22 @@ cv::Mat unsharpMask(const cv::Mat img, const float alpha, const filter_type ft) 
     return empty;
 }
 
+
+cv::Mat unsharpMaskLaplace(const cv::Mat img, const float alpha) {
+    cv::Mat blur = laplacian(img);
+
+    cv::Mat empty = cv::Mat::zeros({img.cols, img.rows}, CV_8UC1);
+
+    for (int i = 0; i < empty.rows * empty.cols; i++) {
+        float value = (img.data[i] + alpha * blur.data[i]) / (1);
+        value = value > HIGH ? HIGH : value;
+        value = value < 0 ? 0 : value;
+        empty.data[i] = value;
+    }
+
+    return empty;
+}
+
 }
 
 
