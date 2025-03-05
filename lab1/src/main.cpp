@@ -33,50 +33,107 @@ T vmin(T first, T second, Args ... tail) {
 
 
 cv::Mat maxMinFilter(const cv::Mat& src) {
-    size_t h = src.rows;
-    size_t w = src.cols;
+    int h = src.rows;
+    int w = src.cols;
 
     cv::Mat dst(h, w, CV_8UC1);
 
-    cv::Mat zeros(h + 4, w + 4, CV_8UC1, cv::Scalar(0));
-    cv::Mat ones(h + 4, w + 4, CV_8UC1, cv::Scalar(255));
-
-    src.copyTo(zeros(cv::Rect(2, 2, w, h)));
-    src.copyTo(ones(cv::Rect(2, 2, w, h)));
-
-    w += 4;
-    h += 4;
-
     for (auto y = 2; y < h - 2; y++) {
-        auto zeros_ptr0 = zeros.ptr<uint8_t>(y - 2);
-        auto zeros_ptr1 = zeros.ptr<uint8_t>(y - 1);
-        auto zeros_ptr2 = zeros.ptr<uint8_t>(y);
-        auto zeros_ptr3 = zeros.ptr<uint8_t>(y + 1);
-        auto zeros_ptr4 = zeros.ptr<uint8_t>(y + 2);
+        auto ps0 = src.ptr<uint8_t>(y - 2);
+        auto ps1 = src.ptr<uint8_t>(y - 1);
+        auto ps2 = src.ptr<uint8_t>(y + 0);
+        auto ps3 = src.ptr<uint8_t>(y + 1);
+        auto ps4 = src.ptr<uint8_t>(y + 2);
 
-        auto ones_ptr0 = ones.ptr<uint8_t>(y - 2);
-        auto ones_ptr1 = ones.ptr<uint8_t>(y - 1);
-        auto ones_ptr2 = ones.ptr<uint8_t>(y);
-        auto ones_ptr3 = ones.ptr<uint8_t>(y + 1);
-        auto ones_ptr4 = ones.ptr<uint8_t>(y + 2);
+        auto pd = dst.ptr<uint8_t>(y);
 
-        auto dst_ptr = dst.ptr<uint8_t>(y - 2);
+        for (auto x = 0; x < w; x++) {
+            auto x0 = std::clamp(x - 2, 0, w - 1);
+            auto x1 = std::clamp(x - 1, 0, w - 1);
+            auto x2 = std::clamp(x + 0, 0, w - 1);
+            auto x3 = std::clamp(x + 1, 0, w - 1);
+            auto x4 = std::clamp(x + 2, 0, w - 1);
 
-        for (auto x = 2; x < w - 2; x++) {
-            dst_ptr[x-2] = vmax(
-                zeros_ptr0[x-2], zeros_ptr0[x-1], zeros_ptr0[x], zeros_ptr0[x+1], zeros_ptr0[x+2],
-                zeros_ptr1[x-2], zeros_ptr1[x-1], zeros_ptr1[x], zeros_ptr1[x+1], zeros_ptr1[x+2],
-                zeros_ptr2[x-2], zeros_ptr2[x-1], zeros_ptr2[x], zeros_ptr2[x+1], zeros_ptr2[x+2],
-                zeros_ptr3[x-2], zeros_ptr3[x-1], zeros_ptr3[x], zeros_ptr3[x+1], zeros_ptr3[x+2],
-                zeros_ptr4[x-2], zeros_ptr4[x-1], zeros_ptr4[x], zeros_ptr4[x+1], zeros_ptr4[x+2]
+            pd[x] = vmax(
+                ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+                ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+                ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4],
+                ps3[x0], ps3[x1], ps3[x2], ps3[x3], ps3[x4],
+                ps4[x0], ps4[x1], ps4[x2], ps4[x3], ps4[x4]
             ) - vmin(
-                ones_ptr0[x-2], ones_ptr0[x-1], ones_ptr0[x], ones_ptr0[x+1], ones_ptr0[x+2],
-                ones_ptr1[x-2], ones_ptr1[x-1], ones_ptr1[x], ones_ptr1[x+1], ones_ptr1[x+2],
-                ones_ptr2[x-2], ones_ptr2[x-1], ones_ptr2[x], ones_ptr2[x+1], ones_ptr2[x+2],
-                ones_ptr3[x-2], ones_ptr3[x-1], ones_ptr3[x], ones_ptr3[x+1], ones_ptr3[x+2],
-                ones_ptr4[x-2], ones_ptr4[x-1], ones_ptr4[x], ones_ptr4[x+1], ones_ptr4[x+2]
+                ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+                ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+                ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4],
+                ps3[x0], ps3[x1], ps3[x2], ps3[x3], ps3[x4],
+                ps4[x0], ps4[x1], ps4[x2], ps4[x3], ps4[x4]
             );
         }
+    }
+
+    auto ps0 = src.ptr<uint8_t>(0);
+    auto ps1 = src.ptr<uint8_t>(1);
+    auto ps2 = src.ptr<uint8_t>(2);
+    auto ps3 = src.ptr<uint8_t>(3);
+    auto pshm1 = src.ptr<uint8_t>(h - 1);
+    auto pshm2 = src.ptr<uint8_t>(h - 2);
+    auto pshm3 = src.ptr<uint8_t>(h - 3);
+    auto pshm4 = src.ptr<uint8_t>(h - 4);
+
+    auto pd0 = dst.ptr<uint8_t>(0);
+    auto pd1 = dst.ptr<uint8_t>(1);
+    auto pdhm1 = dst.ptr<uint8_t>(h - 1);
+    auto pdhm2 = dst.ptr<uint8_t>(h - 2);
+
+    for (auto x = 0; x < w; x++) {
+        auto x0 = std::clamp(x - 2, 0, w - 1);
+        auto x1 = std::clamp(x - 1, 0, w - 1);
+        auto x2 = std::clamp(x + 0, 0, w - 1);
+        auto x3 = std::clamp(x + 1, 0, w - 1);
+        auto x4 = std::clamp(x + 2, 0, w - 1);
+
+        pd0[x] = vmax(
+            ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+            ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+            ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4]
+        ) - vmin(
+            ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+            ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+            ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4]
+        );
+
+        pd1[x] = vmax(
+                ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+                ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+                ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4],
+                ps3[x0], ps3[x1], ps3[x2], ps3[x3], ps3[x4]
+            ) - vmin(
+                ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+                ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+                ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4],
+                ps3[x0], ps3[x1], ps3[x2], ps3[x3], ps3[x4]
+            );
+
+        pdhm1[x] = vmax(
+            pshm1[x0], pshm1[x1], pshm1[x2], pshm1[x3], pshm1[x4],
+            pshm2[x0], pshm2[x1], pshm2[x2], pshm2[x3], pshm2[x4],
+            pshm3[x0], pshm3[x1], pshm3[x2], pshm3[x3], pshm3[x4]
+        ) - vmin(
+            pshm1[x0], pshm1[x1], pshm1[x2], pshm1[x3], pshm1[x4],
+            pshm2[x0], pshm2[x1], pshm2[x2], pshm2[x3], pshm2[x4],
+            pshm3[x0], pshm3[x1], pshm3[x2], pshm3[x3], pshm3[x4]
+        );
+
+        pdhm2[x] = vmax(
+                pshm1[x0], pshm1[x1], pshm1[x2], pshm1[x3], pshm1[x4],
+                pshm2[x0], pshm2[x1], pshm2[x2], pshm2[x3], pshm2[x4],
+                pshm3[x0], pshm3[x1], pshm3[x2], pshm3[x3], pshm3[x4],
+                pshm4[x0], pshm4[x1], pshm4[x2], pshm4[x3], pshm4[x4]
+            ) - vmin(
+                pshm1[x0], pshm1[x1], pshm1[x2], pshm1[x3], pshm1[x4],
+                pshm2[x0], pshm2[x1], pshm2[x2], pshm2[x3], pshm2[x4],
+                pshm3[x0], pshm3[x1], pshm3[x2], pshm3[x3], pshm3[x4],
+                pshm4[x0], pshm4[x1], pshm4[x2], pshm4[x3], pshm4[x4]
+            );
     }
 
     return dst;
@@ -84,70 +141,121 @@ cv::Mat maxMinFilter(const cv::Mat& src) {
 
 
 cv::Mat maxMinFilterVectered(const cv::Mat& src) {
-    size_t h = src.rows;
-    size_t w = src.cols;
+    int h = src.rows;
+    int w = src.cols;
 
     cv::Mat dst(h, w, CV_8UC1);
-
-    cv::Mat zeros(h + 4, w + 4, CV_8UC1, cv::Scalar(0));
-    cv::Mat ones(h + 4, w + 4, CV_8UC1, cv::Scalar(255));
-
-    src.copyTo(zeros(cv::Rect(2, 2, w, h)));
-    src.copyTo(ones(cv::Rect(2, 2, w, h)));
-
-    w += 4;
-    h += 4;
 
     uint8_t buf_max[w];
     uint8_t buf_min[w];
 
     for (auto y = 2; y < h - 2; y++) {
-        auto zeros_ptr0 = zeros.ptr<uint8_t>(y - 2);
-        auto zeros_ptr1 = zeros.ptr<uint8_t>(y - 1);
-        auto zeros_ptr2 = zeros.ptr<uint8_t>(y);
-        auto zeros_ptr3 = zeros.ptr<uint8_t>(y + 1);
-        auto zeros_ptr4 = zeros.ptr<uint8_t>(y + 2);
+        auto ps0 = src.ptr<uint8_t>(y - 2);
+        auto ps1 = src.ptr<uint8_t>(y - 1);
+        auto ps2 = src.ptr<uint8_t>(y + 0);
+        auto ps3 = src.ptr<uint8_t>(y + 1);
+        auto ps4 = src.ptr<uint8_t>(y + 2);
 
-        auto ones_ptr0 = ones.ptr<uint8_t>(y - 2);
-        auto ones_ptr1 = ones.ptr<uint8_t>(y - 1);
-        auto ones_ptr2 = ones.ptr<uint8_t>(y);
-        auto ones_ptr3 = ones.ptr<uint8_t>(y + 1);
-        auto ones_ptr4 = ones.ptr<uint8_t>(y + 2);
+        auto pd = dst.ptr<uint8_t>(y);
 
-        auto dst_ptr = dst.ptr<uint8_t>(y - 2);
-
-        size_t x = 0;
+        int x = 0;
 
         for (; x < w - 15; x += 16) {
-            cv::v_uint8x16 zeros0 = cv::v_load(zeros_ptr0 + x);
-            cv::v_uint8x16 zeros1 = cv::v_load(zeros_ptr1 + x);
-            cv::v_uint8x16 zeros2 = cv::v_load(zeros_ptr2 + x);
-            cv::v_uint8x16 zeros3 = cv::v_load(zeros_ptr3 + x);
-            cv::v_uint8x16 zeros4 = cv::v_load(zeros_ptr4 + x);
+            cv::v_uint8x16 u0 = cv::v_load(ps0 + x);
+            cv::v_uint8x16 u1 = cv::v_load(ps1 + x);
+            cv::v_uint8x16 u2 = cv::v_load(ps2 + x);
+            cv::v_uint8x16 u3 = cv::v_load(ps3 + x);
+            cv::v_uint8x16 u4 = cv::v_load(ps4 + x);
 
-            cv::v_uint8x16 ones0 = cv::v_load(ones_ptr0 + x);
-            cv::v_uint8x16 ones1 = cv::v_load(ones_ptr1 + x);
-            cv::v_uint8x16 ones2 = cv::v_load(ones_ptr2 + x);
-            cv::v_uint8x16 ones3 = cv::v_load(ones_ptr3 + x);
-            cv::v_uint8x16 ones4 = cv::v_load(ones_ptr4 + x);
-
-            cv::v_uint8x16 max = cv::v_max(cv::v_max(cv::v_max(cv::v_max(zeros0, zeros1), zeros2), zeros3), zeros4);
-            cv::v_uint8x16 min = cv::v_min(cv::v_min(cv::v_min(cv::v_min(ones0, ones1), ones2), ones3), ones4);
+            cv::v_uint8x16 max = cv::v_max(cv::v_max(cv::v_max(cv::v_max(u0, u1), u2), u3), u4);
+            cv::v_uint8x16 min = cv::v_min(cv::v_min(cv::v_min(cv::v_min(u0, u1), u2), u3), u4);
 
             cv::v_store(buf_max + x, max);
             cv::v_store(buf_min + x, min);
         }
 
         for (; x < w; x++) {
-            buf_max[x] = vmax(zeros_ptr0[x], zeros_ptr1[x], zeros_ptr2[x], zeros_ptr3[x], zeros_ptr4[x]);
-            buf_min[x] = vmin(ones_ptr0[x], ones_ptr1[x], ones_ptr2[x], ones_ptr3[x], ones_ptr4[x]);
+            buf_max[x] = vmax(ps0[x], ps1[x], ps2[x], ps3[x], ps4[x]);
+            buf_min[x] = vmin(ps0[x], ps1[x], ps2[x], ps3[x], ps4[x]);
         }
 
-        for (x = 2; x < w - 2; x++) {
-            auto max = vmax(buf_max[x-2], buf_max[x-1], buf_max[x], buf_max[x+1], buf_max[x+2]);
-            auto min = vmin(buf_min[x-2], buf_min[x-1], buf_min[x], buf_min[x+1], buf_min[x+2]);
-            dst_ptr[x-2] = max - min;                   
+        for (x = 0; x < w; x++) {
+            auto x0 = std::clamp(x - 2, 0, w - 1);
+            auto x1 = std::clamp(x - 1, 0, w - 1);
+            auto x2 = std::clamp(x + 0, 0, w - 1);
+            auto x3 = std::clamp(x + 1, 0, w - 1);
+            auto x4 = std::clamp(x + 2, 0, w - 1);
+
+            auto max = vmax(buf_max[x0], buf_max[x1], buf_max[x2], buf_max[x3], buf_max[x4]);
+            auto min = vmin(buf_min[x0], buf_min[x1], buf_min[x2], buf_min[x3], buf_min[x4]);
+            pd[x] = max - min;
         }
+    }
+
+    auto ps0 = src.ptr<uint8_t>(0);
+    auto ps1 = src.ptr<uint8_t>(1);
+    auto ps2 = src.ptr<uint8_t>(2);
+    auto ps3 = src.ptr<uint8_t>(3);
+    auto pshm1 = src.ptr<uint8_t>(h - 1);
+    auto pshm2 = src.ptr<uint8_t>(h - 2);
+    auto pshm3 = src.ptr<uint8_t>(h - 3);
+    auto pshm4 = src.ptr<uint8_t>(h - 4);
+
+    auto pd0 = dst.ptr<uint8_t>(0);
+    auto pd1 = dst.ptr<uint8_t>(1);
+    auto pdhm1 = dst.ptr<uint8_t>(h - 1);
+    auto pdhm2 = dst.ptr<uint8_t>(h - 2);
+
+    for (auto x = 0; x < w; x++) {
+        auto x0 = std::clamp(x - 2, 0, w - 1);
+        auto x1 = std::clamp(x - 1, 0, w - 1);
+        auto x2 = std::clamp(x + 0, 0, w - 1);
+        auto x3 = std::clamp(x + 1, 0, w - 1);
+        auto x4 = std::clamp(x + 2, 0, w - 1);
+
+        pd0[x] = vmax(
+            ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+            ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+            ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4]
+        ) - vmin(
+            ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+            ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+            ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4]
+        );
+
+        pd1[x] = vmax(
+                ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+                ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+                ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4],
+                ps3[x0], ps3[x1], ps3[x2], ps3[x3], ps3[x4]
+            ) - vmin(
+                ps0[x0], ps0[x1], ps0[x2], ps0[x3], ps0[x4],
+                ps1[x0], ps1[x1], ps1[x2], ps1[x3], ps1[x4],
+                ps2[x0], ps2[x1], ps2[x2], ps2[x3], ps2[x4],
+                ps3[x0], ps3[x1], ps3[x2], ps3[x3], ps3[x4]
+            );
+
+        pdhm1[x] = vmax(
+            pshm1[x0], pshm1[x1], pshm1[x2], pshm1[x3], pshm1[x4],
+            pshm2[x0], pshm2[x1], pshm2[x2], pshm2[x3], pshm2[x4],
+            pshm3[x0], pshm3[x1], pshm3[x2], pshm3[x3], pshm3[x4]
+        ) - vmin(
+            pshm1[x0], pshm1[x1], pshm1[x2], pshm1[x3], pshm1[x4],
+            pshm2[x0], pshm2[x1], pshm2[x2], pshm2[x3], pshm2[x4],
+            pshm3[x0], pshm3[x1], pshm3[x2], pshm3[x3], pshm3[x4]
+        );
+
+        pdhm2[x] = vmax(
+                pshm1[x0], pshm1[x1], pshm1[x2], pshm1[x3], pshm1[x4],
+                pshm2[x0], pshm2[x1], pshm2[x2], pshm2[x3], pshm2[x4],
+                pshm3[x0], pshm3[x1], pshm3[x2], pshm3[x3], pshm3[x4],
+                pshm4[x0], pshm4[x1], pshm4[x2], pshm4[x3], pshm4[x4]
+            ) - vmin(
+                pshm1[x0], pshm1[x1], pshm1[x2], pshm1[x3], pshm1[x4],
+                pshm2[x0], pshm2[x1], pshm2[x2], pshm2[x3], pshm2[x4],
+                pshm3[x0], pshm3[x1], pshm3[x2], pshm3[x3], pshm3[x4],
+                pshm4[x0], pshm4[x1], pshm4[x2], pshm4[x3], pshm4[x4]
+            );
     }
 
     return dst;
@@ -183,12 +291,25 @@ int main(int argc, char* argv[]) {
 
     std::cout << "basic: " << dt1 << " ms, vectorized: " << dt2 << "ms, opencv: " << dt3 * 1e-6 << " ms" << std::endl;
 
+    bool equal = true;
+    for (auto y = 0; y < src.rows; y++) {
+        for (auto x = 0; x < src.cols; x++) {
+            auto& res1 = res_vec.at<uint8_t>(y, x);
+            auto& res2 = res_cv.at<uint8_t>(y, x);
+            if (res1 != res2) {
+                equal = false;
+                std::cout << y << " " << x << " " << int(res1) << " " << int(res2) << std::endl;
+            }
+        }
+    }
+    std::cout << "is equal: " << (equal ? "true" : "false") << std::endl;
+
     cv::imshow("src", src);
     cv::imshow("cv", res_cv);
     cv::imshow("my", res);
     cv::imshow("my_vec", res_vec);
     cv::imshow("diff", cv::abs(res_vec - res));
-    cv::imshow("diff_cv", cv::abs(res_cv - res));
+    cv::imshow("diff_cv", cv::abs(res_cv - res_vec));
     cv::waitKey(0);
 
     return 0;
