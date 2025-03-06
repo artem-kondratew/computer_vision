@@ -1,3 +1,4 @@
+#include <chrono>
 #include <filesystem>
 
 #include <gtest/gtest.h>
@@ -9,7 +10,12 @@ TEST(maxMinFilterTests, maxMinFilter) {
     std::string image_path = std::filesystem::current_path().parent_path() / std::filesystem::path("image.jpg");
     cv::Mat src = cv::imread(image_path, cv::IMREAD_GRAYSCALE);
 
+    auto t1 = std::chrono::system_clock::now();
     cv::Mat res_custom = maxMinFilter(src);
+    auto t2 = std::chrono::system_clock::now();
+
+    auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    std::cout << "maxMinFilter: " << dt << " ms" << std::endl;
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
     cv::Mat max, min;
@@ -28,7 +34,12 @@ TEST(maxMinFilterTests, maxMinFilterVectorized) {
     std::string image_path = std::filesystem::current_path().parent_path() / std::filesystem::path("image.jpg");
     cv::Mat src = cv::imread(image_path, cv::IMREAD_GRAYSCALE);
 
+    auto t1 = std::chrono::system_clock::now();
     cv::Mat res_custom = maxMinFilterVectorized(src);
+    auto t2 = std::chrono::system_clock::now();
+
+    auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    std::cout << "maxMinFilterVectorized: " << dt << " ms" << std::endl;
 
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
     cv::Mat max, min;
