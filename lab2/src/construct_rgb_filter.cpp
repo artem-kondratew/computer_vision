@@ -4,15 +4,7 @@
 #include <opencv4/opencv2/imgproc.hpp>
 #include <opencv4/opencv2/highgui.hpp>
 
-
-struct Filter {
-    cv::Vec3d v;
-    cv::Scalar p0;
-    double t1, t2;
-    double r;
-
-    Filter(cv::Vec3d v, cv::Scalar p0, double t1, double t2, double r) : v{v}, p0{p0}, t1{t1}, t2{t2}, r{r} {}
-};
+#include "filter.hpp"
 
 
 template <typename T>
@@ -83,45 +75,16 @@ Filter construct_filter(cv::Mat train_image, cv::Mat mask) {
 }
 
 
-cv::Mat apply_filter(cv::Mat test_image, Filter filter, double threshold) {
-    cv::Mat data = test_image.reshape(1, test_image.rows * test_image.cols);
-    data.convertTo(data, CV_64FC1);
-
-    cv::Mat t = (data - filter.p0) * filter.v;
-
-    cv::Mat dt = cv::abs(t - (filter.t1 + filter.t2) / 2) - (filter.t2 - filter.t1) / 2;
-    dt = cv::max(dt, 0);
-
-    cv::Mat dp = norm(t * filter.v.t() - (data - filter.p0));
-    dp = cv::max(dp - filter.r, 0);
-
-    cv::Mat err = dp + dt;
-
-    cv::Mat mask = err < threshold;
-    mask.convertTo(mask, CV_8UC1);
-    mask = mask.reshape(1, {test_image.rows, test_image.cols});
-
-    cv::Mat result(test_image.size(), CV_8UC1, cv::Scalar{0});
-    result.setTo(255, mask);
-    
-    return result;
-}
-
-
 int main(int argc, char* argv[]) {
-    cv::Mat train_image = cv::imread("/home/user/computer_vision/lab2/train.png", cv::IMREAD_COLOR);
-    cv::Mat mask = cv::imread("/home/user/computer_vision/lab2/mask.png", cv::IMREAD_GRAYSCALE);
+    if (argc != 4) {
+        std::cerr << "wrong usage. correct usage: construct_rgb_filter <path_to_train_image> <path_to_mask> <path_to_json>" << std::endl;
+        exit(1);
+    }
+    cv::Mat train_image = cv::imread(argv[1], cv::IMREAD_COLOR);
+    cv::Mat mask = cv::imread(argv[2], cv::IMREAD_GRAYSCALE);
 
     Filter filter = construct_filter(train_image, mask);
-
-    cv::Mat test_image = cv::imread("/home/user/computer_vision/lab2/test.png", cv::IMREAD_COLOR);
-
-    double threshold = 12;
-    cv::Mat result = apply_filter(test_image, filter, threshold);
-
-    cv::imshow("test_image", test_image);
-    cv::imshow("result", result);
-    cv::waitKey(0);
+    filter.writeToJson(argv[3]);
 
     return 0;
 }
