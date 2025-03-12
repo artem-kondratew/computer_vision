@@ -55,10 +55,6 @@ int main(int argc, char* argv[]) {
     double threshold = 12;
     cv::Mat result = apply_filter(test_image, filter, threshold);
 
-    cv::imshow("test_image", test_image);
-    cv::imshow("result", result);
-    cv::waitKey(0);
-
     cv::imwrite(argv[3], result);
 
     return 0;
