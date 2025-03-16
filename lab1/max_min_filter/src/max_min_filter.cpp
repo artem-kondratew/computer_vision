@@ -96,13 +96,24 @@ cv::Mat maxMinFilterVectorized(const cv::Mat& src) {
 
         for (; x < w - 15; x += 16) {
             cv::v_uint8x16 u0 = cv::v_load(ps0 + x);
-            cv::v_uint8x16 u1 = cv::v_load(ps1 + x);
-            cv::v_uint8x16 u2 = cv::v_load(ps2 + x);
-            cv::v_uint8x16 u3 = cv::v_load(ps3 + x);
-            cv::v_uint8x16 u4 = cv::v_load(ps4 + x);
+            cv::v_uint8x16 max = u0;
+            cv::v_uint8x16 min = u0;
 
-            cv::v_uint8x16 max = cv::v_max(cv::v_max(cv::v_max(cv::v_max(u0, u1), u2), u3), u4);
-            cv::v_uint8x16 min = cv::v_min(cv::v_min(cv::v_min(cv::v_min(u0, u1), u2), u3), u4);
+            cv::v_uint8x16 u1 = cv::v_load(ps1 + x);
+            max = cv::v_max(max, u1);
+            min = cv::v_min(min, u1);
+
+            cv::v_uint8x16 u2 = cv::v_load(ps2 + x);
+            max = cv::v_max(max, u2);
+            min = cv::v_min(min, u2);
+
+            cv::v_uint8x16 u3 = cv::v_load(ps3 + x);
+            max = cv::v_max(max, u3);
+            min = cv::v_min(min, u3);
+
+            cv::v_uint8x16 u4 = cv::v_load(ps4 + x);
+            max = cv::v_max(max, u4);
+            min = cv::v_min(min, u4);
 
             cv::v_store(buf_max + x, max);
             cv::v_store(buf_min + x, min);
