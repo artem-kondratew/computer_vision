@@ -140,8 +140,6 @@ void matchCorners(const cv::Mat& im1, const cv::Mat& im2, const std::vector<cv::
     std::vector<cv::Mat> pyr2 = createGaussianPyramid(im2, nlevels);
 
     findMatchedCorners(corners, pyr1, pyr2, matches, mask);
-
-    std::cout << im1.size() << std::endl;
 }
 
 }  // match_corners
