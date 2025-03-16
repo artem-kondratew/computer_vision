@@ -18,3 +18,6 @@ target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} GTest::GTest)
 
 add_executable(runTests tests/tests_main.cpp src/max_min_filter.cpp)
 target_link_libraries(runTests ${OpenCV_LIBS} GTest::GTest)
+
+add_test(NAME max_min_filter_tests COMMAND runTests)
+    
