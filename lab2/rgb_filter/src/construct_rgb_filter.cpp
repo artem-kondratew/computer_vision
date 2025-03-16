@@ -34,12 +34,15 @@ Filter construct_filter(cv::Mat train_image, cv::Mat mask) {
 
     int idx = 0;
     for (auto y = 0; y < mask.rows; y++) {
+        const uint8_t* mask_row = mask.ptr<uint8_t>(y);
+        cv::Vec3b* img_row = train_image.ptr<cv::Vec3b>(y);
         for (auto x = 0; x < mask.cols; x++) {
-            if (mask.at<uint8_t>(y, x) == 255) {
-                cv::Vec3b& pixel = train_image.at<cv::Vec3b>(y, x);
-                data.at<double>(idx, 0) = pixel[0];
-                data.at<double>(idx, 1) = pixel[1];
-                data.at<double>(idx, 2) = pixel[2];
+            if (mask_row[x] == 255) {
+                cv::Vec3b& pixel = img_row[x];
+                double* data_ptr = data.ptr<double>(idx);
+                data_ptr[0] = pixel[0];
+                data_ptr[1] = pixel[1];
+                data_ptr[2] = pixel[2];
                 idx++;
             }
         }
