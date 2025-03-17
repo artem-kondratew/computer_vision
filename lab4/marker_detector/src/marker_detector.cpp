@@ -6,7 +6,7 @@
 #include <opencv4/opencv2/highgui.hpp>
 
 
-bool checkMarker(std::vector<cv::Point> points) {
+bool checkMarker(const std::vector<cv::Point>& points) {
     cv::Point mean{0, 0};
     for (auto pt : points) {
         mean.x += pt.x;
@@ -25,6 +25,10 @@ bool checkMarker(std::vector<cv::Point> points) {
         }
     }
 
+    if (idx == -1) {
+        return false;
+    }
+
     cv::Mat lengths(points.size(), 1, CV_64FC1);
     for (auto i = 0; i < lengths.rows; i++) {
         int j = (i == 0) ? lengths.rows - 1 : i - 1;
@@ -35,14 +39,14 @@ bool checkMarker(std::vector<cv::Point> points) {
 
     int err = 0.1 * L;
 
-    cv::Point& center = points[idx];
+    const cv::Point& center = points[idx];
 
-    size_t sz = points.size();
-    cv::Point& d1 = points[(idx - 2 + sz) % sz];
-    cv::Point& d2 = points[(idx - 1 + sz) % sz];
-    cv::Point& d3 = points[(idx + 1 + sz) % sz];
-    cv::Point& d4 = points[(idx + 2 + sz) % sz];
-    cv::Point& d5 = points[(idx + 3 + sz) % sz];
+    int sz = points.size();
+    const cv::Point& d1 = points[(idx - 2 + sz) % sz];
+    const cv::Point& d2 = points[(idx - 1 + sz) % sz];
+    const cv::Point& d3 = points[(idx + 1 + sz) % sz];
+    const cv::Point& d4 = points[(idx + 2 + sz) % sz];
+    const cv::Point& d5 = points[(idx + 3 + sz) % sz];
 
     cv::Point line_center = (d1 + d4) / 2;
 
@@ -85,8 +89,6 @@ int main(int argc, char* argv[]) {
     }
 
     cv::Mat image = cv::imread(argv[1], cv::IMREAD_GRAYSCALE);
-
-    cv::RNG rng(12345);
 
     cv::Mat blurred;
     cv::blur(image, blurred, cv::Size(3, 3));
