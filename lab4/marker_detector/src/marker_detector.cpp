@@ -32,7 +32,7 @@ bool checkMarker(const std::vector<cv::Point>& points) {
     cv::Mat lengths(points.size(), 1, CV_64FC1);
     for (auto i = 0; i < lengths.rows; i++) {
         int j = (i == 0) ? lengths.rows - 1 : i - 1;
-        lengths.at<double>(i, 1) = cv::norm(points[0] - points[j]);
+        lengths.at<double>(i, 0) = cv::norm(points[i] - points[j]);
     }
 
     double L = cv::sum(lengths)[0];
@@ -67,10 +67,6 @@ bool checkMarker(const std::vector<cv::Point>& points) {
     }
 
     if (cv::abs(cv::norm(d4 - d5) - 2 * cv::norm(center - d3)) > err) {
-        return false;
-    }
-
-    if (cv::abs(cv::norm(d1 - d5) - 2 * cv::norm(d3 - d4)) > err) {
         return false;
     }
 
