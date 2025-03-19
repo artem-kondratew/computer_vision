@@ -10,8 +10,28 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -Ofast")
 
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-add_executable(match_corners  src/match_corners.cpp)
-target_link_libraries(match_corners ${OpenCV_LIBS})
+add_executable(match_corners 
+    src/include/corners_matching.hpp
+    src/corners_matching.cpp
+    src/match_corners.cpp
+)
 
-add_executable(find_homography_matrix  src/find_homography_matrix.cpp)
+add_executable(find_homography_matrix
+    src/include/corners_matching.hpp
+    src/corners_matching.cpp
+    src/include/homography.hpp
+    src/homography.cpp
+    src/find_homography_matrix.cpp
+)
+
+add_executable(create_panorama
+    src/include/corners_matching.hpp
+    src/corners_matching.cpp
+    src/include/homography.hpp
+    src/homography.cpp
+    src/create_panorama.cpp
+)
+
+target_link_libraries(match_corners ${OpenCV_LIBS})
 target_link_libraries(find_homography_matrix ${OpenCV_LIBS})
+target_link_libraries(create_panorama ${OpenCV_LIBS})

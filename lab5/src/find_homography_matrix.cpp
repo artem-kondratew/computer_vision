@@ -1,4 +1,4 @@
-#include "include/corners_matching.hpp"
+#include "include/homography.hpp"
 
 
 int main(int argc, char* argv[]) {
@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 
     if (im1.empty() || im2.empty()) {
         std::cerr << "empty image" << std::endl;
-        exit(2);
+        return -1;
     }
 
     if (im1.cols != 640 || im1.rows != 480) {
@@ -39,9 +39,22 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    std::cout << good_matches.size() << " of " << corners.size() << " matched" << std::endl;    
+    std::vector<cv::Point2f> points1, points2;
+    for (const auto& m : good_matches) {
+        points1.push_back(m.first);
+        points2.push_back(m.second);
+    }
 
-    match_corners::draw(good_matches, im1, im2);
+    std::cout << good_matches.size() << " of " << corners.size() << " matched" << std::endl;
+
+    cv::Mat H = findHomographyMatrixRANSAC(points1, points2, 0.999, 6., 2000, false, false);
+
+    cv::Mat im2_warped;
+    cv::warpPerspective(im2, im2_warped, H, im2.size());
+    
+    cv::imshow("im1", im1);
+    cv::imshow("im2_wapred", im2_warped);
+    cv::waitKey(0);
 
     return 0;
 }
