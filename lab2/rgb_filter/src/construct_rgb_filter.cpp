@@ -7,17 +7,7 @@
 #include "filter.hpp"
 
 
-template <typename T>
-cv::Mat norm(T src) {
-    cv::Mat res;
-    cv::multiply(src, src, res);
-    cv::reduce(res, res, 1, cv::REDUCE_SUM);
-    cv::sqrt(res, res);
-    return res;
-}
-
-
-double percentile(cv::Mat t, int percentile) {
+double percentile(const cv::Mat& t, int percentile) {
     cv::Mat sorted;
     cv::sort(t, sorted, cv::SORT_EVERY_COLUMN + cv::SORT_ASCENDING);
 
@@ -27,7 +17,7 @@ double percentile(cv::Mat t, int percentile) {
 }
 
 
-Filter construct_filter(cv::Mat train_image, cv::Mat mask) {
+Filter construct_filter(const cv::Mat& train_image, const cv::Mat& mask) {
     int num_nonzero = cv::countNonZero(mask);
 
     cv::Mat data(num_nonzero, 3, CV_64FC1);
@@ -35,10 +25,10 @@ Filter construct_filter(cv::Mat train_image, cv::Mat mask) {
     int idx = 0;
     for (auto y = 0; y < mask.rows; y++) {
         const uint8_t* mask_row = mask.ptr<uint8_t>(y);
-        cv::Vec3b* img_row = train_image.ptr<cv::Vec3b>(y);
+        const cv::Vec3b* img_row = train_image.ptr<cv::Vec3b>(y);
         for (auto x = 0; x < mask.cols; x++) {
             if (mask_row[x] == 255) {
-                cv::Vec3b& pixel = img_row[x];
+                const cv::Vec3b& pixel = img_row[x];
                 double* data_ptr = data.ptr<double>(idx);
                 data_ptr[0] = pixel[0];
                 data_ptr[1] = pixel[1];
@@ -67,10 +57,19 @@ Filter construct_filter(cv::Mat train_image, cv::Mat mask) {
 
     cv::Mat t = d * v;
 
+    std::cout << d.size() << std::endl;
+
     double t1 = percentile(t, 5);
     double t2 = percentile(t, 95);
 
-    cv::Mat dp = norm(t * v.t() - d);
+    std::cout << "ok0" << std::endl;
+
+    cv::Mat dp(d.rows, 1, CV_64FC1);
+    for (auto i = 0; i < d.rows; i++) {
+        dp.at<double>(i, 0) = cv::norm(d.at<cv::Vec3d>(i, 0).cross(v)) / std::pow(cv::norm(v), 2);
+    }
+
+    std::cout << dp.rows << " " << dp.cols << std::endl;
 
     double r = percentile(dp, 95);
 

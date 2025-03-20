@@ -7,26 +7,21 @@
 #include "filter.hpp"
 
 
-template <typename T>
-cv::Mat norm(T src) {
-    cv::Mat res;
-    cv::multiply(src, src, res);
-    cv::reduce(res, res, 1, cv::REDUCE_SUM);
-    cv::sqrt(res, res);
-    return res;
-}
-
-
-cv::Mat apply_filter(cv::Mat test_image, Filter filter, double threshold) {
+cv::Mat apply_filter(const cv::Mat& test_image, const Filter& filter, double threshold) {
     cv::Mat data = test_image.reshape(1, test_image.rows * test_image.cols);
     data.convertTo(data, CV_64FC1);
 
-    cv::Mat t = (data - filter.p0) * filter.v;
+    cv::Mat d = data - filter.p0;
+
+    cv::Mat t = d * filter.v;
 
     cv::Mat dt = cv::abs(t - (filter.t1 + filter.t2) / 2) - (filter.t2 - filter.t1) / 2;
     dt = cv::max(dt, 0);
 
-    cv::Mat dp = norm(t * filter.v.t() - (data - filter.p0));
+    cv::Mat dp(d.rows, 1, CV_64FC1);
+    for (auto i = 0; i < d.rows; i++) {
+        dp.at<double>(i, 0) = cv::norm(d.at<cv::Vec3d>(i, 0).cross(filter.v)) / std::pow(cv::norm(filter.v), 2);
+    }
     dp = cv::max(dp - filter.r, 0);
 
     cv::Mat err = dp + dt;
@@ -56,6 +51,9 @@ int main(int argc, char* argv[]) {
     cv::Mat result = apply_filter(test_image, filter, threshold);
 
     cv::imwrite(argv[3], result);
+
+    cv::imshow("result", result);
+    cv::waitKey(0);
 
     return 0;
 }
